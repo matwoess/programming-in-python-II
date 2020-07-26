@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""ex6.py
+Author: Mathias
+Matr.Nr.: k11709064
+Exercise 6
+"""
 import torch
 from torch import Tensor
 from typing import Tuple
@@ -19,19 +25,18 @@ def ex6(logits: Tensor, activation_function, threshold: Tensor, targets: Tensor)
     if len([v for v in targets if v]) == 0 or len([v for v in targets if not v]) == 0:
         raise ValueError(f'targets tensor must contain at least one positive and one negative value')
     # calculations
-    n_samples = len(targets)
+    n_samples = len(logits)
     output = activation_function(logits)
     prediction_mask = [b for b in output >= threshold]
-    targets_mask = [b for b in targets >= threshold]
-    tp = sum([1 for p, t in zip(prediction_mask, targets_mask) if t and p])
-    tn = sum([1 for p, t in zip(prediction_mask, targets_mask) if not t and not p])
-    fp = sum([1 for p, t in zip(prediction_mask, targets_mask) if not t and p])
-    fn = sum([1 for p, t in zip(prediction_mask, targets_mask) if t and not p])
+    tp = sum([1 for p, t in zip(prediction_mask, targets) if t and p])
+    tn = sum([1 for p, t in zip(prediction_mask, targets) if not t and not p])
+    fp = sum([1 for p, t in zip(prediction_mask, targets) if not t and p])
+    fn = sum([1 for p, t in zip(prediction_mask, targets) if t and not p])
     assert tp + tn + fp + fn == n_samples
     P = tp + fn
     N = tn + fp
     tpr = 1.0 if P == 0 else tp / P
-    tnr = 1.0 - tpr if N == 0 else tn / N  # not sure about that
+    tnr = 1.0 if N == 0 else tn / N
     fpr = 1 - tnr
     fnr = 1 - tpr
     acc = (tp + tn) / n_samples
